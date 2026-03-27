@@ -66,5 +66,9 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>Textify needs camera access to scan text</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Textify needs photo access to read screenshots</string>
 </dict>
 </plist>
