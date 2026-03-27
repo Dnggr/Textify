@@ -1,68 +1,65 @@
-// NOTE: This is the APP-LEVEL build.gradle (android/app/build.gradle)
-// not the project-level one.
+import java.util.Properties
 
 plugins {
-    id "com.android.application"
-    id "kotlin-android"
-    id "dev.flutter.flutter-gradle-plugin"
+    id("com.android.application")
+    id("kotlin-android")
+    id("dev.flutter.flutter-gradle-plugin")
 }
 
-def localProperties = new Properties()
-def localPropertiesFile = rootProject.file('local.properties')
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
 if (localPropertiesFile.exists()) {
-    localPropertiesFile.withReader('UTF-8') { reader ->
+    localPropertiesFile.reader(Charsets.UTF_8).use { reader ->
         localProperties.load(reader)
     }
 }
 
-def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
-if (flutterVersionCode == null) {
-    flutterVersionCode = '1'
-}
-
-def flutterVersionName = localProperties.getProperty('flutter.versionName')
-if (flutterVersionName == null) {
-    flutterVersionName = '1.0'
-}
+val flutterVersionCode = localProperties.getProperty("flutter.versionCode") ?: "1"
+val flutterVersionName = localProperties.getProperty("flutter.versionName") ?: "1.0"
 
 android {
-    namespace "com.dnggr.textify"
-    compileSdk 34                   // Target Android 14
-    ndkVersion flutter.ndkVersion
+    namespace = "com.dnggr.textify"
+    compileSdk = 36          // Change from 34 to 36
+    ndkVersion = flutter.ndkVersion
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
 
     kotlinOptions {
-        jvmTarget = '1.8'
+        // This removes the "deprecated" warning
+        freeCompilerArgs += listOf("-Xjsr305=strict")
+        jvmTarget = "1.8"
     }
 
     sourceSets {
-        main.java.srcDirs += 'src/main/kotlin'
+        getByName("main") {
+            // Use the .srcDir() function instead of +=
+            java.srcDir("src/main/kotlin")
+        }
     }
 
     defaultConfig {
-        applicationId "com.dnggr.textify"
-        minSdkVersion 21            // ML Kit minimum requirement
-        targetSdkVersion 34
-        versionCode flutterVersionCode.toInteger()
-        versionName flutterVersionName
+        applicationId = "com.dnggr.textify"
+        minSdk = flutter.minSdkVersion
+        targetSdk = 36       // Change from 34 to 36
+        versionCode = flutterVersionCode.toInt()
+        versionName = flutterVersionName
     }
 
     buildTypes {
-        release {
-            signingConfig signingConfigs.debug
+        getByName("release") {
+            // Using debug signing for now so it runs on your phone easily
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
 }
 
 flutter {
-    source '../..'
+    source = "../.."
 }
 
 dependencies {
-    // ML Kit bundled model — ensures OCR works offline without downloads
-    implementation 'com.google.android.gms:play-services-mlkit-text-recognition:19.0.0'
+    implementation("com.google.android.gms:play-services-mlkit-text-recognition:19.0.0")
 }
