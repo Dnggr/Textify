@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'camera_screen.dart';
-import 'gallery_screen.dart';
+import 'batch_gallery_screen.dart';
 import '../widgets/action_button.dart';
 
-/// The main home screen of Textify.
-/// Shows two primary actions: scan with camera, or pick from gallery.
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -21,29 +19,25 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   void initState() {
     super.initState();
-
-    // Entry animation — everything fades + slides up on first load
     _animController = AnimationController(
       duration: const Duration(milliseconds: 900),
       vsync: this,
     );
-
     _fadeIn = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _animController,
         curve: const Interval(0.0, 0.7, curve: Curves.easeOut),
       ),
     );
-
-    _slideUp = Tween<Offset>(begin: const Offset(0, 0.08), end: Offset.zero)
-        .animate(
-          CurvedAnimation(
-            parent: _animController,
-            curve: const Interval(0.0, 0.7, curve: Curves.easeOut),
-          ),
-        );
-
-    // Auto-start the animation when screen loads
+    _slideUp = Tween<Offset>(
+      begin: const Offset(0, 0.08),
+      end: Offset.zero,
+    ).animate(
+      CurvedAnimation(
+        parent: _animController,
+        curve: const Interval(0.0, 0.7, curve: Curves.easeOut),
+      ),
+    );
     _animController.forward();
   }
 
@@ -67,24 +61,13 @@ class _HomeScreenState extends State<HomeScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // ── Top bar ──────────────────────────────────────────
                   _buildTopBar(),
-
                   const Spacer(flex: 2),
-
-                  // ── Hero title block ─────────────────────────────────
                   _buildHeroTitle(),
-
                   const Spacer(flex: 3),
-
-                  // ── Two main action buttons ──────────────────────────
                   _buildActionButtons(context),
-
                   const Spacer(flex: 2),
-
-                  // ── Bottom hint ──────────────────────────────────────
                   _buildBottomHint(),
-
                   const SizedBox(height: 8),
                 ],
               ),
@@ -99,7 +82,6 @@ class _HomeScreenState extends State<HomeScreen>
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        // App logo / wordmark
         RichText(
           text: const TextSpan(
             children: [
@@ -124,8 +106,6 @@ class _HomeScreenState extends State<HomeScreen>
             ],
           ),
         ),
-
-        // Version badge
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
           decoration: BoxDecoration(
@@ -134,12 +114,9 @@ class _HomeScreenState extends State<HomeScreen>
             color: Colors.white.withOpacity(0.04),
           ),
           child: const Text(
-            'v1.0',
+            'v1.1',
             style: TextStyle(
-              color: Colors.white38,
-              fontSize: 11,
-              letterSpacing: 1,
-            ),
+                color: Colors.white38, fontSize: 11, letterSpacing: 1),
           ),
         ),
       ],
@@ -150,7 +127,6 @@ class _HomeScreenState extends State<HomeScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Glowing accent line
         Container(
           width: 40,
           height: 2,
@@ -166,7 +142,6 @@ class _HomeScreenState extends State<HomeScreen>
           ),
         ),
         const SizedBox(height: 20),
-
         const Text(
           'Scan.\nExtract.\nDone.',
           style: TextStyle(
@@ -177,11 +152,9 @@ class _HomeScreenState extends State<HomeScreen>
             letterSpacing: -1,
           ),
         ),
-
         const SizedBox(height: 16),
-
         const Text(
-          'Point your camera at any text, or upload a\nscreenshot — Textify extracts it instantly.',
+          'Point your camera at any text, or batch\nscan up to 15 screenshots at once.',
           style: TextStyle(
             color: Colors.white38,
             fontSize: 14,
@@ -196,7 +169,6 @@ class _HomeScreenState extends State<HomeScreen>
   Widget _buildActionButtons(BuildContext context) {
     return Row(
       children: [
-        // ── Camera button ─────────────────────────────────────────
         Expanded(
           child: ActionButton(
             icon: Icons.camera_alt_rounded,
@@ -204,25 +176,25 @@ class _HomeScreenState extends State<HomeScreen>
             subtitle: 'Point & scan\nany text',
             color: const Color(0xFF00E5FF),
             isLarge: true,
-            onTap: () {
-              Navigator.push(context, _buildPageRoute(const CameraScreen()));
-            },
+            onTap: () => Navigator.push(
+              context,
+              _buildPageRoute(const CameraScreen()),
+            ),
           ),
         ),
-
         const SizedBox(width: 16),
-
-        // ── Gallery button ────────────────────────────────────────
         Expanded(
           child: ActionButton(
-            icon: Icons.image_rounded,
+            icon: Icons.photo_library_rounded,
             label: 'GALLERY',
-            subtitle: 'Pick a photo\nor screenshot',
+            // ↓ Updated subtitle to reflect new batch feature
+            subtitle: 'Batch scan\nup to 15 pics',
             color: const Color(0xFFB388FF),
             isLarge: true,
-            onTap: () {
-              Navigator.push(context, _buildPageRoute(const GalleryScreen()));
-            },
+            onTap: () => Navigator.push(
+              context,
+              _buildPageRoute(const BatchGalleryScreen()),
+            ),
           ),
         ),
       ],
@@ -253,7 +225,6 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
-  // Smooth slide-from-right page transition
   PageRoute _buildPageRoute(Widget screen) {
     return PageRouteBuilder(
       pageBuilder: (context, animation, secondaryAnimation) => screen,
