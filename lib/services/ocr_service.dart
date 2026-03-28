@@ -1,45 +1,65 @@
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 
 /// Handles all OCR operations using Google ML Kit.
-/// This service processes an image file path and returns the recognized text.
+/// Supports single image and batch processing.
 class OcrService {
-  // TextRecognizer is the main ML Kit engine.
-  // We use the Latin script recognizer which supports English + most
-  // Western European languages out of the box, offline, for free.
   final TextRecognizer _textRecognizer = TextRecognizer(
     script: TextRecognitionScript.latin,
   );
 
-  /// Takes an image file path and returns the recognized text as a String.
-  /// Returns an empty string if no text is found.
-  /// Throws an exception if processing fails.
+  /// Extracts text from a single image path.
   Future<String> extractText(String imagePath) async {
-    // 1. Wrap the image file in an InputImage (ML Kit's format)
     final InputImage inputImage = InputImage.fromFilePath(imagePath);
-
-    // 2. Run the recognizer — this is the actual OCR call
-    final RecognizedText recognizedText = await _textRecognizer.processImage(
-      inputImage,
-    );
-
-    // 3. recognizedText.text contains the full extracted text as a plain string.
-    //    You can also access recognizedText.blocks for per-paragraph data,
-    //    or .lines and .elements for more granular control.
-    return recognizedText.text;
+    final RecognizedText recognized =
+        await _textRecognizer.processImage(inputImage);
+    return recognized.text;
   }
 
-  /// Returns structured text blocks — useful if you want to display
-  /// text with its original positioning or bounding boxes later.
-  Future<List<TextBlock>> extractTextBlocks(String imagePath) async {
-    final InputImage inputImage = InputImage.fromFilePath(imagePath);
-    final RecognizedText recognizedText = await _textRecognizer.processImage(
-      inputImage,
-    );
-    return recognizedText.blocks;
+  /// Batch process a list of image paths.
+  /// Returns a map of imagePath → extractedText.
+  /// Processes sequentially to avoid overloading ML Kit.
+  ///
+  /// [onProgress] is called after each image is processed,
+  /// with the current index (0-based) so you can show a progress indicator.
+  Future<Map<String, String>> extractTextBatch(
+    List<String> imagePaths, {
+    void Function(int processedIndex)? onProgress,
+  }) async {
+    final Map<String, String> results = {};
+
+    for (int i = 0; i < imagePaths.length; i++) {
+      try {
+        final text = await extractText(imagePaths[i]);
+        results[imagePaths[i]] = text;
+      } catch (e) {
+        // Store empty string on error — caller can check for empty
+        results[imagePaths[i]] = '';
+      }
+      // Report progress after each image
+      onProgress?.call(i);
+    }
+
+    return results;
   }
 
-  /// IMPORTANT: Always call dispose() when you're done with the service
-  /// (e.g., in the State's dispose() method) to free ML Kit resources.
+  /// Combines results from multiple images into a single string,
+  /// separated by a divider showing the image number.
+  static String combineResults(
+    List<String> orderedPaths,
+    Map<String, String> results,
+  ) {
+    final buffer = StringBuffer();
+    for (int i = 0; i < orderedPaths.length; i++) {
+      final text = results[orderedPaths[i]] ?? '';
+      if (text.trim().isNotEmpty) {
+        if (buffer.isNotEmpty) buffer.writeln();
+        buffer.writeln('── Screenshot ${i + 1} ──');
+        buffer.writeln(text.trim());
+      }
+    }
+    return buffer.toString().trim();
+  }
+
   void dispose() {
     _textRecognizer.close();
   }
