@@ -1,7 +1,7 @@
 name: textify
 description: OCR app — scan text from camera or gallery using Google ML Kit.
 publish_to: 'none'
-version: 1.0.0+1
+version: 1.1.0+2
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
@@ -16,16 +16,28 @@ dependencies:
   # ── Camera live preview ──────────────────────────────────────────────
   camera: ^0.11.0
 
-  # ── Pick images from gallery ─────────────────────────────────────────
+  # ── Pick images from gallery (supports multi-image selection) ────────
   image_picker: ^1.1.2
 
-  # ── Runtime permission handling (camera, storage) ────────────────────
+  # ── Runtime permission handling ──────────────────────────────────────
   permission_handler: ^11.3.1
 
   # ── Share extracted text to other apps ───────────────────────────────
   share_plus: ^10.0.0
 
-  # ── Flutter default icons (already included, keeping explicit) ───────
+  # ── NEW: Image cropping (native UI via uCrop on Android) ─────────────
+  image_cropper: ^9.1.0
+
+  # ── NEW: Save .txt files to user-chosen location ─────────────────────
+  file_picker: ^8.1.7
+
+  # ── NEW: Write files to Downloads / custom path ──────────────────────
+  path_provider: ^2.1.5
+
+  # ── NEW: Image painting / drawing canvas (draw + undo/redo) ──────────
+  # We build the drawing canvas ourselves with Flutter's CustomPainter
+  # No extra package needed — uses dart:ui and Flutter's built-in Canvas
+
   cupertino_icons: ^1.0.6
 
 dev_dependencies:
