@@ -39,6 +39,7 @@ dependencies:
   # No extra package needed — uses dart:ui and Flutter's built-in Canvas
 
   cupertino_icons: ^1.0.6
+  image: ^4.5.4
 
 dev_dependencies:
   flutter_test:
