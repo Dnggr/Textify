@@ -48,3 +48,8 @@ git clone [https://github.com/Dnggr/Textify.git](https://github.com/Dnggr/Textif
 cd Textify
 flutter pub get
 flutter run
+```
+---
+
+### 👤 Made by
+[**@Dnggr**](https://github.com/Dnggr)
