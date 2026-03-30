@@ -1,5 +1,6 @@
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'image_preprocessor.dart';
+import 'text_cleaner.dart';
 
 /// Handles all OCR operations using Google ML Kit.
 /// Supports single image and batch processing.
@@ -10,13 +11,13 @@ class OcrService {
 
   /// Extracts text from a single image path.
   Future<String> extractText(String imagePath) async {
-    // Preprocess the image before OCR
     final processedPath = await ImagePreprocessor.preprocess(imagePath);
-
     final InputImage inputImage = InputImage.fromFilePath(processedPath);
     final RecognizedText recognized =
         await _textRecognizer.processImage(inputImage);
-    return recognized.text;
+
+    // Clean the raw OCR output
+    return TextCleaner.clean(recognized.text);
   }
 
   /// Batch process a list of image paths.
